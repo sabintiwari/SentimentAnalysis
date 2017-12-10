@@ -1,0 +1,6 @@
+SentimentAnalysis.sln
+SentimentAnalysis/__pycache__/
+SentimentAnalysis/logs/
+SentimentAnalysis/data/*.csv
+SentimentAnalysis/SentimentAnalysis.pyproj
+SentimentAnalysis/SentimentAnalysis.pyproj.user
