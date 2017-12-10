@@ -1,5 +1,5 @@
 __pycache__/
-logs/
+logs/*.*
 data/*.csv
 SentimentAnalysis.pyproj
 SentimentAnalysis.pyproj.user

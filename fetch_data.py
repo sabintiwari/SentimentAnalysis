@@ -13,13 +13,13 @@ import tweepy
 # Main Method
 def main(args):
     # read the configs from the file
-    config = get_config("config.json")
+    config = get_config()
     count = config["data_count"]
     max_id = config["max_tweet_id"]
     filename = config["filename"]
 
     # clear the log file for FetchData
-    open("logs\\FetchData.py.log", "w").close()
+    io.open("logs\\FetchData.py.log", "w").close()
 
     # setup the twitter authorization
     auth = tweepy.OAuthHandler(config["consumer_key"], config["consumer_secret"])
@@ -41,21 +41,18 @@ def main(args):
         if max_id != 0:
             # if the max id is provided, get tweets that have the max id to the value
             log("Getting " + str(count) + " statuses with ids that are less than " + str(count))
-            statuses = api.user_timeline(user.id, count=count, max_id=max_id)
+            statuses = tweepy.Cursor(api.user_timeline, id=user.id, count=count, max_id=max_id).items()
         else:
             # else get the most recent tweets
             log("Getting " + str(count) + " most recent statuses")
-            statuses = api.user_timeline(user.id, count=count)
-        # log the count of the statuses
-        log(str(len(statuses)) + " total status message were retrieved")
+            statuses = tweepy.Cursor(api.user_timeline, count=count, id=user.id).items()
         # get the replies for each status received
         for status in statuses:
             replies = get_all_replies(api, status, user.screen_name)
             # call the add tweets to file to append the obtained replies to the csv file
             total = add_tweets_to_file(status, replies, filename, total)
-            # if the status is the last one, show the output and log
-            if statuses.index(status) == len(statuses) - 1:
-                log("The last tweet processed has the id: " + status.id_str)
+        # log the count of the statuses
+        log(str(statuses.num_tweets) + " total status messages were retrieved")
     except tweepy.TweepError:
         # if there is a ratelimit error, sleep for 15 minutes and try again
         log("Twitter API rate limit has been reached")
@@ -86,7 +83,7 @@ def check_rate_limit(api, wait=True, buffer=0.1):
         limit = int(api.last_response.headers["x-rate-limit-limit"])
         reset = int(api.last_response.headers["x-rate-limit-reset"])
         # get the time and print the time requests remaining for the current reset
-        reset = datetime.fromtimestamp(reset)
+        reset = datetime.datetime.fromtimestamp(reset)
         log("0 out of {} remaining. Reset at {}".format(limit, reset))
         if wait:
             # wait till the limit is reset until if the wait flag is passed
@@ -107,7 +104,7 @@ def get_all_replies(api, tweet, user):
     replies = []
     # wait for rate limit to replenish and call the search query
     check_rate_limit(api)
-    results = api.search(q=query, since_id=tweet_id, tweet_mode="extended")
+    results = tweepy.Cursor(api.search, q=query, since_id=tweet_id, tweet_mode="extended", count=500).items()
     # for each result check if the reply matches the current tweet
     for result in results:
         if result.in_reply_to_status_id_str == tweet_id:
@@ -118,8 +115,8 @@ def get_all_replies(api, tweet, user):
     return replies
 
 # Gets the config json object from the provided file
-def get_config(path):
-    file = open(path)
+def get_config():
+    file = io.open("config.json")
     text = file.read()
     file.close()
     return json.loads(text)
