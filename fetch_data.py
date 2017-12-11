@@ -40,19 +40,20 @@ def main(args):
         check_rate_limit(api)
         if max_id != 0:
             # if the max id is provided, get tweets that have the max id to the value
-            log("Getting " + str(count) + " statuses with ids that are less than " + str(count))
-            statuses = tweepy.Cursor(api.user_timeline, id=user.id, count=count, max_id=max_id).items()
+            log("Getting " + str(count) + " statuses with ids that are less than " + str(max_id))
+            # get the replies for each status received
+            for status in tweepy.Cursor(api.user_timeline, id=user.id, count=count, max_id=max_id).items():
+                replies = get_all_replies(api, status, user.screen_name)
+                #call the add tweets to file to append the obtained replies to the csv file
+                total = add_tweets_to_file(status, replies, filename, total)
         else:
             # else get the most recent tweets
             log("Getting " + str(count) + " most recent statuses")
-            statuses = tweepy.Cursor(api.user_timeline, count=count, id=user.id).items()
-        # get the replies for each status received
-        for status in statuses:
-            replies = get_all_replies(api, status, user.screen_name)
-            # call the add tweets to file to append the obtained replies to the csv file
-            total = add_tweets_to_file(status, replies, filename, total)
-        # log the count of the statuses
-        log(str(statuses.num_tweets) + " total status messages were retrieved")
+            # get the replies for each status received
+            for status in tweepy.Cursor(api.user_timeline, count=count, id=user.id).items():
+                replies = get_all_replies(api, status, user.screen_name)
+                #call the add tweets to file to append the obtained replies to the csv file
+                total = add_tweets_to_file(status, replies, filename, total)
     except tweepy.TweepError:
         # if there is a ratelimit error, sleep for 15 minutes and try again
         log("Twitter API rate limit has been reached")
@@ -87,7 +88,7 @@ def check_rate_limit(api, wait=True, buffer=0.1):
         log("0 out of {} remaining. Reset at {}".format(limit, reset))
         if wait:
             # wait till the limit is reset until if the wait flag is passed
-            delay = (reset - datetime.now()).total_seconds() + buffer
+            delay = (reset - datetime.datetime.now()).total_seconds() + buffer
             log("Waiting for {} second(s)".format(delay))
             sleep(delay)
             return True
@@ -104,12 +105,10 @@ def get_all_replies(api, tweet, user):
     replies = []
     # wait for rate limit to replenish and call the search query
     check_rate_limit(api)
-    results = tweepy.Cursor(api.search, q=query, since_id=tweet_id, tweet_mode="extended", count=500).items()
     # for each result check if the reply matches the current tweet
-    for result in results:
+    for result in tweepy.Cursor(api.search, q=query, since_id=tweet_id, tweet_mode="extended", count=500).items():
         if result.in_reply_to_status_id_str == tweet_id:
             replies.append(result)
-    
     # update the log and return the list of replies
     log(str(len(replies)) + " total replies were retrieved for " + tweet.id_str)
     return replies

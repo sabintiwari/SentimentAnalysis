@@ -1,12 +1,15 @@
 {
+  "title": "Configuration file for the fetch_data class.",
+  "author": "Sabin Raj Tiwari",
+
   "consumer_key": "yQlRd08tmFIxmqv0oQjllGVU7",
   "consumer_secret": "0oYvwcv42YXKGFztaaoyy5cK7GJCZaQYDVE08FGirZaFtnFjzx",
   "access_token": "1488087702-GbgElkWFZwcfgduPjouMQCbeyvpmgCtEz9aQMdO",
   "access_token_secret": "Yc3PTZssvk7qoITQWHTNHEyYofdZaTtYsCiqvJQ9p0r9n",
 
-  "user": "bbcnepali",
-  "data_count": 50,
+  "user": "Annapurna_Post",
+  "data_count": 200,
   "max_tweet_id": 0,
 
-  "filename": "data\\bbcnepali.csv"
+  "filename": "data\\Annapurna_Post.csv"
 }

@@ -11,9 +11,6 @@ def setup_paths():
     # get the working directory
     work_dir = os.getcwd()
 
-    # add the path for tweepy
-    sys.path.insert(0, "{}\\libraries\\tweepy.egg".format(work_dir))
-
     # add the path for indic_nlp_library and setup the resources
     sys.path.insert(0, "{}\\libraries\\indic_nlp_library.egg".format(work_dir))
     from indicnlp import common
