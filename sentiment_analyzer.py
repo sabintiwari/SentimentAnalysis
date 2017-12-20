@@ -174,7 +174,6 @@ class SentimentAnalyzer(object):
         acc.append(self.get_acc(zb, self.y_test))
         return acc, methods
 
-
     '''
         Method that normalizes the provided text. Since Indic scripts have a lot of 'quirky behaviour',
         this is needed to canonicalize the representation of text so that the inputs are consistent.
