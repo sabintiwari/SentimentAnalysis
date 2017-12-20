@@ -30,13 +30,14 @@ This will create a log file in the logs folder name `Main.py.log` which will con
 It will also output the results of each of the models in a .csv file in the results folder with their respective names.
 
 ***
-#### Contents
+#### Contents of the src directory
 ***
-`data/dataset.xlsx` - The Excel sheet containing the dataset that was used along with the labels.
-`data/stopwords.xlsx` - The Excel sheet containing the stopwords that gets used to transform the data.
-`results/results.xlsx` - The Excel sheet that contains the results of the experiments.
-`config.json` - Configuration file used to get the Twitter data. I have cleared out the keys and tokens used to query the data because those were from my Twitter dev account. If you would like to use the fetch_data.py code to retrieve Twitter data, then the keys need to be generated.
-`fetch_data.py` - Script that retrieves data from Twitter using the config file. Outputs the results in a csv file.
-`initialize.py` - Initialize the paths to the indic-nlp-library and the data needed by it.
-`main.py` - The main script of the project that uses the dataset and the sentiment_analyzer to perform all the experiments and write the results.
-`sentiment_analyzer.py` - The class that does the work of transforming the data, creating the models, and has methods that can be called to perform experiments on those models.
+* `data/dataset.xlsx` - The Excel sheet containing the dataset that was used along with the labels.
+* `data/stopwords.xlsx` - The Excel sheet containing the stopwords that gets used to transform the data.
+* `results/results.xlsx` - The Excel sheet that contains the results of the experiments.
+* `config.json` - Configuration file used to get the Twitter data. I have cleared out the keys and tokens used to query the data because those were from my Twitter dev account. If you would like to use the fetch_data.py code to retrieve Twitter data, then the keys need to be generated.
+* `fetch_data.py` - Script that retrieves data from Twitter using the config file. Outputs the results in a csv file.
+* `initialize.py` - Initialize the paths to the indic-nlp-library and the data needed by it.
+* `main.py` - The main script of the project that uses the dataset and the sentiment_analyzer to perform all the experiments and write the results.
+* `sentiment_analyzer.py` - The class that does the work of transforming the data, creating the models, and has methods that can be called to perform experiments on those models.
+* `setup.bat` - The batch script that can be used to install all the dependencies.
