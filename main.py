@@ -45,30 +45,31 @@ def main():
     log("k: " + str(ks))
     log("Accuracy: " + str(acc))
     log("kNN Finished...")
+    write_results("knn.csv", ks, acc, "k", "accuracy")
 
     # train the model against a linear SVM
     log("Running Linear SVM on the dataset...")
-    cs = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-    acc, cs = sa.svm_lin(cs)
+    acc, cs = sa.svm_lin()
     log("C: " + str(cs))
     log("Accuracy: " + str(acc))
     log("Linear SVM Finished...")
+    write_results("svm_lin.csv", cs, acc, "C", "accuracy")
 
     # train the model against a SVM
     log("Running SVM on the dataset...")
-    cs = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-    acc, cs = sa.svm_svc(cs)
+    acc, cs = sa.svm_svc()
     log("C: " + str(cs))
     log("Accuracy: " + str(acc))
     log("SVM Finished...")
+    write_results("svm_rbf.csv", cs, acc, "C", "accuracy")
 
     # train the model against a nuSVM
     log("Running nuSVM on the dataset...")
-    cs = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-    acc, cs = sa.svm_nu()
-    log("C: " + str(cs))
+    acc, kernels = sa.svm_nu()
+    log("Kernel: " + str(kernels))
     log("Accuracy: " + str(acc))
     log("nuSVM Finished...")
+    write_results("svm_nu.csv", kernels, acc, "kernel", "accuracy")
 
     # train the model against a SVC
     log("Running Naive Bayes on the dataset...")
@@ -76,6 +77,15 @@ def main():
     log("Method: " + str(methods))
     log("Accuracy: " + str(acc))
     log("Naive Bayes Finished...")
+    write_results("nb.csv", methods, acc, "method", "accuracy")
+
+    # train the model against an MLP neural network
+    log("Running MLP Neural Network on the dataset...")
+    acc, alphas = sa.mlp()
+    log("Alphas: " + str(alphas))
+    log("Accuracy: " + str(acc))
+    log("MLP Neural Network Finished...")
+    write_results("mlp.csv", alphas, acc, "alpha", "accuracy")
 
 # Gets the list from the excel data columns
 def get_list(datasheet, column_name):
@@ -92,6 +102,22 @@ def log(message):
     file = io.open("logs\\Main.py.log", "a+", encoding="utf8")
     file.write(message + "\n")
     file.close()
+
+# Writes the results provided in a csv file with the name
+def write_results(file, x, y, lbl_x, lbl_y):
+    file = io.open("results\\" + file, "w", encoding="utf8")
+    file.write(lbl_x + "," + lbl_y + "\n")
+    for i in range(len(x)):
+        file.write(str(x[i]) + "," + str(y[i]) + "\n")
+    file.close()
+
+# Saves the results as a line plot.
+def save_plot(file, x, y, lbl_x, lbl_y):
+    tf = pandas.DataFrame()
+    plot = tf.plot()
+    fig = plot.get_figure()
+    fig.savefig(file)
+    return "";
 
 # Call the main method
 main()

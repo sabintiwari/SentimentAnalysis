@@ -1,5 +1,6 @@
-# import default libraries
+# import libraries
 import math
+import numpy
 import re
 import sys
 
@@ -14,6 +15,7 @@ from indicnlp.tokenize import indic_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import naive_bayes
 from sklearn import neighbors
+from sklearn import neural_network
 from sklearn import svm
 from sklearn import utils
 
@@ -56,7 +58,7 @@ class SentimentAnalyzer(object):
                                           lowercase=False, tokenizer=self.tokenize_text, stop_words=stopwords)
 
         # shuffle the data first
-        x, y = utils.shuffle(x, y, random_state=5)
+        x, y = utils.shuffle(x, y, random_state=2)
 
         # get certain number of testing and training data
         test_size = math.floor(len(x) * ratio)
@@ -128,6 +130,26 @@ class SentimentAnalyzer(object):
         return acc, ks
 
     '''
+        Trains and tests the dataset using a mlp neural network using the different number of hidden
+        layers provided.
+        Returns the list of accuracies and the alphas used.
+    '''
+    def mlp(self):
+        # setup the alphas in logspace
+        alphas = numpy.logspace(-10, 3, 10)
+        acc = []
+        # iterate through the layers and run the training
+        for alpha in alphas:
+            # setup the model, fit the data, and predit
+            model = neural_network.MLPClassifier(solver="lbfgs", activation="tanh", hidden_layer_sizes=(6, 2), 
+                                                 alpha=alpha, learning_rate="invscaling", early_stopping=True,
+                                                 shuffle=False)
+            z = model.fit(self.x_train, self.y_train).predict(self.x_test)
+            # add the accuracy to the list
+            acc.append(self.get_acc(z, self.y_test))
+        return  acc, alphas
+
+    '''
         Trains and tests the dataset using naive bayes with Gaussian, Multinomial, and Bernoulli
         Returns the accuracy for the 3 differents type of methods and the method names.
     '''
@@ -176,7 +198,9 @@ class SentimentAnalyzer(object):
         Trains and tests the dataset using a linear SVM for the provided C values.
         Returns the list of accuracies and the cs used.
     '''
-    def svm_lin(self, cs):
+    def svm_lin(self):
+        # set the cs using logspace
+        cs = numpy.logspace(-10, 3, 10)
         acc = []
         # iterate through the cs and perform different classifications
         for c in cs:
@@ -198,7 +222,7 @@ class SentimentAnalyzer(object):
         # iterate through the kernel and perform different classifictions
         for method in methods:
             # setup the svc, fit the training data, and predict
-            nu = svm.NuSVC(nu=0.4,kernel=method)
+            nu = svm.NuSVC(nu=0.1,kernel=method)
             nu.fit(self.x_train, self.y_train)
             z = nu.predict(self.x_test)
             # add the accuracy to the list
@@ -209,7 +233,9 @@ class SentimentAnalyzer(object):
         Trains and tests the dataset using a SVM for the provided C values.
         Returns the list of accuracies and the cs used.
     '''
-    def svm_svc(self, cs):
+    def svm_svc(self):
+        # set the cs using logspace
+        cs = numpy.logspace(-10, 3, 10)
         acc = []
         # iterate through the cs and perform different classifications
         for c in cs:

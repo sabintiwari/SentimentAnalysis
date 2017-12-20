@@ -20,13 +20,12 @@ Note: This project has only been tested on Windows 10.
 ***
 #### Run
 ***
+	The main script of the project is contained in the `main.py` file. In order to run the program, you can run it like so from command prompt/shell:
+	```bash
+	python ./main.py
+	```
 
-***
-#### References
+	This will create a log file in the logs folder name `Main.py.log` which will contain the outputs of the program.
 
-* http://nbviewer.jupyter.org/url/anoopkunchukuttan.github.io/indic_nlp_library/doc/indic_nlp_examples.ipynb
-* https://andhint.github.io/machine-learning/nlp/Feature-Extraction-From-Text/
-* https://marcobonzanini.com/2015/03/09/mining-twitter-data-with-python-part-2/
-* http://anoopkunchukuttan.github.io/indic_nlp_library/
-
+	It will also output the results of each of the models in a .csv file in the results folder with their respective names.
 ***

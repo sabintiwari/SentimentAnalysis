@@ -62,7 +62,7 @@ def main(args):
 
     # log the total number of data retrieved
     log(str(total) + " total number of replies added since tweet id " + str(min_id))
-    
+
 
 # Helper Functions
 
