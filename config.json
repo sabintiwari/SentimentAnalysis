@@ -7,9 +7,9 @@
   "access_token": "1488087702-GbgElkWFZwcfgduPjouMQCbeyvpmgCtEz9aQMdO",
   "access_token_secret": "Yc3PTZssvk7qoITQWHTNHEyYofdZaTtYsCiqvJQ9p0r9n",
 
-  "user": "Annapurna_Post",
-  "data_count": 200,
+  "user": "NepalPoliceHQ",
+  "data_count": 500,
   "max_tweet_id": 0,
 
-  "filename": "data\\Annapurna_Post.csv"
+  "filename": "data\\NepalPoliceHQ.csv"
 }

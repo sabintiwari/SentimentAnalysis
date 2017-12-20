@@ -4,6 +4,7 @@ import io
 import json
 import os
 import sys
+import time
 
 # import the third party libraries
 import initialize
@@ -38,38 +39,39 @@ def main(args):
     try:
         # try to get the timeline for the user
         check_rate_limit(api)
+        tweet_ids = []
         if max_id != 0:
             # if the max id is provided, get tweets that have the max id to the value
             log("Getting " + str(count) + " statuses with ids that are less than " + str(max_id))
             # get the replies for each status received
             for status in tweepy.Cursor(api.user_timeline, id=user.id, count=count, max_id=max_id).items():
-                replies = get_all_replies(api, status, user.screen_name)
-                #call the add tweets to file to append the obtained replies to the csv file
-                total = add_tweets_to_file(status, replies, filename, total)
+                tweet_ids.append(status.id)
         else:
             # else get the most recent tweets
             log("Getting " + str(count) + " most recent statuses")
             # get the replies for each status received
             for status in tweepy.Cursor(api.user_timeline, count=count, id=user.id).items():
-                replies = get_all_replies(api, status, user.screen_name)
-                #call the add tweets to file to append the obtained replies to the csv file
-                total = add_tweets_to_file(status, replies, filename, total)
+                tweet_ids.append(status.id)
+        # get all the replies since the lowest id
+        min_id = min(tweet_ids)
+        replies = get_all_replies(api, min_id, user.screen_name)
+        total = add_tweets_to_file(replies, filename, total)
     except tweepy.TweepError:
         # if there is a ratelimit error, sleep for 15 minutes and try again
         log("Twitter API rate limit has been reached")
 
     # log the total number of data retrieved
-    log("Total number of replies added: " + str(total))
+    log(str(total) + " total number of replies added since tweet id " + str(min_id))
     
 
 # Helper Functions
 
-# Adds the provided tweet data to the file that was passed.
-def add_tweets_to_file(tweet, replies, filepath, total):
+# Adds the provided tweet replies to the file that was passed.
+def add_tweets_to_file(replies, filepath, total):
     file = io.open(filepath, "a+", encoding="utf8")
     for reply in replies:
         total = total + 1
-        file.write(tweet.id_str + "," + reply.id_str + ",\"" + reply.full_text + "\"\n")
+        file.write("\"" + reply.full_text + "\"\n")
     file.close()
     return total
 
@@ -90,27 +92,24 @@ def check_rate_limit(api, wait=True, buffer=0.1):
             # wait till the limit is reset until if the wait flag is passed
             delay = (reset - datetime.datetime.now()).total_seconds() + buffer
             log("Waiting for {} second(s)".format(delay))
-            sleep(delay)
+            time.sleep(delay)
             return True
         else:
             # return false when requests cannot be made
             return False
 
-# Gets all the replies to the provided tweet.
-def get_all_replies(api, tweet, user):
+# Gets all the replies to since the provided minimum tweet id.
+def get_all_replies(api, min_id, user):
     # setup the query using the tweet id and username
-    tweet_id = tweet.id_str
-    log("Getting all replies to the tweet with id: " + tweet_id)
+    log("Getting all replies since  the tweet with id: " + str(min_id))
     query = "to:" + user
     replies = []
     # wait for rate limit to replenish and call the search query
     check_rate_limit(api)
     # for each result check if the reply matches the current tweet
-    for result in tweepy.Cursor(api.search, q=query, since_id=tweet_id, tweet_mode="extended", count=500).items():
-        if result.in_reply_to_status_id_str == tweet_id:
-            replies.append(result)
-    # update the log and return the list of replies
-    log(str(len(replies)) + " total replies were retrieved for " + tweet.id_str)
+    for result in tweepy.Cursor(api.search, q=query, since_id=str(min_id), tweet_mode="extended", count=1000).items():
+        replies.append(result)
+    #return the list of replies
     return replies
 
 # Gets the config json object from the provided file
